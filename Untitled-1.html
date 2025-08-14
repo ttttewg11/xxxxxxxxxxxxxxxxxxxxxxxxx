@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูลโครงการ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'TH Sarabun New', 'Sarabun', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #333;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: inherit;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background: #45a049;
+        }
+
+        .btn-danger {
+            background: #f44336;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+        }
+
+        .btn-secondary:hover {
+            background: #0b7dda;
+        }
+
+        .btn-warning {
+            background: #FF9800;
+        }
+
+        .btn-warning:hover {
+            background: #F57C00;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .data-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .data-table .center {
+            text-align: center;
+        }
+
+        .year-header {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .budget-input {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: right;
+            font-size: 16px;
+        }
+
+        .project-details {
+            max-width: 250px;
+            word-wrap: break-word;
+            font-size: 16px;
+        }
+
+        .kpi-section {
+            border-left: 3px solid #2196F3;
+            padding-left: 10px;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .number-col {
+            width: 50px;
+            text-align: center;
+        }
+
+        .project-col {
+            width: 250px;
+        }
+
+        .objective-col {
+            width: 200px;
+        }
+
+        .target-col {
+            width: 250px;
+        }
+
+        .budget-col {
+            width: 120px;
+        }
+
+        .kpi-col {
+            width: 200px;
+        }
+
+        .result-col {
+            width: 250px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .sub-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 16px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .data-table {
+                font-size: 14px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .header h2 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>1. ยุทธศาสตร์การส่งเสริมการมีส่วนร่วมในการจัดการศึกษา</h1>
+            <h2>1.1กลยุทธ์ส่งเสริมและสนับสนุนชุมชนในการศึกษาภาคเรียนและภาคเอกชนให้มีการพัฒนาคุณภาพการศึกษาอย่างต่อเนื่องและมีประสิทธิภาพในการจัดการศึกษา</h2>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">เพิ่มข้อมูลโครงการ/กิจกรรม</div>
+            <form id="projectForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="projectName">โครงการ/กิจกรรม</label>
+                        <input type="text" id="projectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="objective">วัตถุประสงค์</label>
+                        <textarea id="objective" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="target">เป้าหมาย (ผลผลิตของโครงการ)</label>
+                        <textarea id="target" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="kpi">ตัวชี้วัด (KPI)</label>
+                        <textarea id="kpi" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="result">ผลที่คาดว่าจะได้รับ</label>
+                        <textarea id="result" required></textarea>
+                    </div>
+                </div>
+
+                <div class="section-title">งบประมาณแยกตามปี (บาท)</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="budget2566">2566</label>
+                        <input type="number" id="budget2566" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="budget2567">2567</label>
+                        <input type="number" id="budget2567" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="budget2568">2568</label>
+                        <input type="number" id="budget2568" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="budget2569">2569</label>
+                        <input type="number" id="budget2569" min="0" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="budget2570">2570</label>
+                        <input type="number" id="budget2570" min="0" step="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <button type="submit" class="btn">เพิ่มข้อมูล</button>
+                    <button type="button" class="btn btn-danger" onclick="clearForm()">ล้างข้อมูล</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="search-section">
+            <div class="section-title">ค้นหาข้อมูล</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" id="searchInput" placeholder="ค้นหาโครงการ, วัตถุประสงค์, หรือเป้าหมาย...">
+                </div>
+                <div class="form-group">
+                    <select id="yearFilter">
+                        <option value="">ทุกปี</option>
+                        <option value="2566">2566</option>
+                        <option value="2567">2567</option>
+                        <option value="2568">2568</option>
+                        <option value="2569">2569</option>
+                        <option value="2570">2570</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="clearSearch()">ล้างการค้นหา</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="number-col">ที่</th>
+                        <th rowspan="2" class="project-col">โครงการ/กิจกรรม</th>
+                        <th rowspan="2" class="objective-col">วัตถุประสงค์</th>
+                        <th rowspan="2" class="target-col">เป้าหมาย<br>(ผลผลิตของโครงการ)</th>
+                        <th colspan="5" class="year-header">งบประมาณและแหล่งที่มา</th>
+                        <th rowspan="2" class="kpi-col">ตัวชี้วัด<br>(KPI)</th>
+                        <th rowspan="2" class="result-col">ผลที่คาดว่าจะได้รับ</th>
+                        <th rowspan="2" class="number-col">จัดการ</th>
+                    </tr>
+                    <tr>
+                        <th class="budget-col">2566<br>(บาท)</th>
+                        <th class="budget-col">2567<br>(บาท)</th>
+                        <th class="budget-col">2568<br>(บาท)</th>
+                        <th class="budget-col">2569<br>(บาท)</th>
+                        <th class="budget-col">2570<br>(บาท)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="11" class="empty-state">ยังไม่มีข้อมูลโครงการ กรุณาเพิ่มข้อมูลโครงการใหม่</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let projects = [];
+        let filteredProjects = [];
+        let editingIndex = -1;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFormSubmission();
+            initializeSearch();
+            loadProjects();
+        });
+
+        // Initialize form submission
+        function initializeFormSubmission() {
+            const form = document.getElementById('projectForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    saveProject();
+                    clearForm();
+                    renderProjects();
+                }
+            });
+        }
+
+        // Initialize search functionality
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const yearFilter = document.getElementById('yearFilter');
+            
+            searchInput.addEventListener('input', performSearch);
+            yearFilter.addEventListener('change', performSearch);
+        }
+
+        // Validate form
+        function validateForm() {
+            const projectName = document.getElementById('projectName').value.trim();
+            const objective = document.getElementById('objective').value.trim();
+            const target = document.getElementById('target').value.trim();
+            const kpi = document.getElementById('kpi').value.trim();
+            const result = document.getElementById('result').value.trim();
+            
+            if (!projectName || !objective || !target || !kpi || !result) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Save project
+        function saveProject() {
+            const projectData = {
+                projectName: document.getElementById('projectName').value.trim(),
+                objective: document.getElementById('objective').value.trim(),
+                target: document.getElementById('target').value.trim(),
+                kpi: document.getElementById('kpi').value.trim(),
+                result: document.getElementById('result').value.trim(),
+                budget2566: parseInt(document.getElementById('budget2566').value) || 0,
+                budget2567: parseInt(document.getElementById('budget2567').value) || 0,
+                budget2568: parseInt(document.getElementById('budget2568').value) || 0,
+                budget2569: parseInt(document.getElementById('budget2569').value) || 0,
+                budget2570: parseInt(document.getElementById('budget2570').value) || 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (editingIndex >= 0) {
+                projects[editingIndex] = projectData;
+                editingIndex = -1;
+                alert('แก้ไขข้อมูลสำเร็จ');
+            } else {
+                projects.push(projectData);
+                alert('เพิ่มข้อมูลสำเร็จ');
+            }
+            
+            saveToLocalStorage();
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('projectForm').reset();
+            editingIndex = -1;
+            
+            // Update button text
+            const submitBtn = document.querySelector('#projectForm button[type="submit"]');
+            submitBtn.textContent = 'เพิ่มข้อมูล';
+        }
+
+        // Load projects from localStorage
+        function loadProjects() {
+            const savedProjects = localStorage.getItem('educationProjects');
+            if (savedProjects) {
+                projects = JSON.parse(savedProjects);
+            }
+            renderProjects();
+        }
+
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('educationProjects', JSON.stringify(projects));
+        }
+
+        // Render projects table
+        function renderProjects() {
+            const tableBody = document.getElementById('tableBody');
+            const dataToRender = filteredProjects.length > 0 ? filteredProjects : projects;
+            
+            if (dataToRender.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="11" class="empty-state">ยังไม่มีข้อมูลโครงการ กรุณาเพิ่มข้อมูลโครงการใหม่</td></tr>';
+                return;
+            }
+            
+            tableBody.innerHTML = dataToRender.map((project, index) => {
+                const originalIndex = filteredProjects.length > 0 ? projects.indexOf(project) : index;
+                return `
+                    <tr>
+                        <td class="center">${index + 1}</td>
+                        <td class="project-details">${project.projectName}</td>
+                        <td class="project-details">${project.objective}</td>
+                        <td class="project-details">${project.target}</td>
+                        <td class="center">${formatNumber(project.budget2566)}</td>
+                        <td class="center">${formatNumber(project.budget2567)}</td>
+                        <td class="center">${formatNumber(project.budget2568)}</td>
+                        <td class="center">${formatNumber(project.budget2569)}</td>
+                        <td class="center">${formatNumber(project.budget2570)}</td>
+                        <td class="project-details kpi-section">${project.kpi}</td>
+                        <td class="project-details">${project.result}</td>
+                        <td class="center">
+                            <button class="btn btn-warning" onclick="editProject(${originalIndex})" style="margin-bottom: 5px; padding: 6px 12px; font-size: 14px;">แก้ไข</button><br>
+                            <button class="btn btn-danger" onclick="deleteProject(${originalIndex})" style="padding: 6px 12px; font-size: 14px;">ลบ</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Format number with comma separator
+        function formatNumber(num) {
+            return num ? num.toLocaleString() : '-';
+        }
+
+        // Edit project
+        function editProject(index) {
+            const project = projects[index];
+            
+            document.getElementById('projectName').value = project.projectName;
+            document.getElementById('objective').value = project.objective;
+            document.getElementById('target').value = project.target;
+            document.getElementById('kpi').value = project.kpi;
+            document.getElementById('result').value = project.result;
+            document.getElementById('budget2566').value = project.budget2566 || '';
+            document.getElementById('budget2567').value = project.budget2567 || '';
+            document.getElementById('budget2568').value = project.budget2568 || '';
+            document.getElementById('budget2569').value = project.budget2569 || '';
+            document.getElementById('budget2570').value = project.budget2570 || '';
+            
+            editingIndex = index;
+            
+            // Update button text
+            const submitBtn = document.querySelector('#projectForm button[type="submit"]');
+            submitBtn.textContent = 'บันทึกการแก้ไข';
+            
+            // Scroll to form
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Delete project
+        function deleteProject(index) {
+            if (confirm('คุณต้องการลบโครงการนี้หรือไม่?')) {
+                projects.splice(index, 1);
+                saveToLocalStorage();
+                renderProjects();
+                alert('ลบข้อมูลสำเร็จ');
+            }
+        }
+
+        // Perform search
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const yearFilter = document.getElementById('yearFilter').value;
+            
+            filteredProjects = projects.filter(project => {
+                const matchesSearch = !searchTerm || 
+                    project.projectName.toLowerCase().includes(searchTerm) ||
+                    project.objective.toLowerCase().includes(searchTerm) ||
+                    project.target.toLowerCase().includes(searchTerm) ||
+                    project.kpi.toLowerCase().includes(searchTerm) ||
+                    project.result.toLowerCase().includes(searchTerm);
+                
+                const matchesYear = !yearFilter || 
+                    (project[`budget${yearFilter}`] && project[`budget${yearFilter}`] > 0);
+                
+                return matchesSearch && matchesYear;
+            });
+            
+            renderProjects();
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('yearFilter').value = '';
+            filteredProjects = [];
+            renderProjects();
+        }
+    </script>
+</body>
+</html>
